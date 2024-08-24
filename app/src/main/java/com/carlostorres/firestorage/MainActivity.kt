@@ -5,6 +5,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.carlostorres.firestorage.compose.ui.upload.UploadComposeActivity
 import com.carlostorres.firestorage.databinding.ActivityMainBinding
 import com.carlostorres.firestorage.xml.ui.upload.UploadXmlActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnNavToComp.setOnClickListener {
-
+            startActivity(UploadComposeActivity.create(this))
         }
 
     }
