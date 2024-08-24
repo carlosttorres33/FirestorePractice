@@ -5,11 +5,14 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.carlostorres.firestorage.MainActivity
 import com.carlostorres.firestorage.databinding.ActivityUploadXmlBinding
+import com.carlostorres.firestorage.databinding.DialogImageSelectorBinding
 import com.carlostorres.firestorage.xml.presentation.UploadXmlViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
@@ -29,9 +32,15 @@ class UploadXmlActivity : AppCompatActivity() {
     private val uploadViewModel: UploadXmlViewModel by viewModels()
 
     private lateinit var uri : Uri
-    private var intentCameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()){ result ->
+    private var intentCameraLauncher = registerForActivityResult(TakePicture()){ result ->
         if (result && uri.path?.isNotBlank() == true){
             uploadViewModel.uploadBasicImage(uri)
+        }
+    }
+
+    private var intentGalleryLauncher = registerForActivityResult(GetContent()){ uriResult ->
+        uriResult?.let {
+            uploadViewModel.uploadBasicImage(it)
         }
     }
 
@@ -51,8 +60,36 @@ class UploadXmlActivity : AppCompatActivity() {
 
     private fun initListeners() {
         binding.fabImage.setOnClickListener {
-            takePhoto()
+            showImageDialog()
         }
+    }
+
+    private fun showImageDialog() {
+
+        val dialogBinding = DialogImageSelectorBinding.inflate(layoutInflater)
+
+        val alertDialog = AlertDialog.Builder(this).apply {
+            setView(dialogBinding.root)
+        }.create()
+
+        dialogBinding.btnTakePhoto.setOnClickListener {
+            takePhoto()
+            alertDialog.dismiss()
+        }
+
+        dialogBinding.btnGallery.setOnClickListener {
+            getImageFromGallery()
+            alertDialog.dismiss()
+        }
+
+        alertDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        alertDialog.show()
+
+    }
+
+    private fun getImageFromGallery() {
+        intentGalleryLauncher.launch("image/*")
     }
 
     private fun takePhoto(){
