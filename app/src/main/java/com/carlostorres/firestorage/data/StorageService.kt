@@ -10,16 +10,6 @@ class StorageService @Inject constructor(
     private val storage: FirebaseStorage
 ) {
 
-    fun basicExample(){
-
-        val reference = Firebase.storage.reference.child("ejemplo/test.jepg")
-
-        reference.name //test.jepg
-        reference.path //ejemplo/test.jepg
-        reference.bucket //gs://firestorage-8f68b.appspot.com/ ejemplo/test.jepg
-
-    }
-
     fun uploadBasicImage(uri: Uri) {
         val reference = storage.reference.child(uri.lastPathSegment.orEmpty())
         reference.putFile(uri)
