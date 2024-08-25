@@ -10,11 +10,18 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.bumptech.glide.Glide
 import com.carlostorres.firestorage.MainActivity
 import com.carlostorres.firestorage.databinding.ActivityUploadXmlBinding
 import com.carlostorres.firestorage.databinding.DialogImageSelectorBinding
 import com.carlostorres.firestorage.xml.presentation.UploadXmlViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -34,13 +41,17 @@ class UploadXmlActivity : AppCompatActivity() {
     private lateinit var uri : Uri
     private var intentCameraLauncher = registerForActivityResult(TakePicture()){ result ->
         if (result && uri.path?.isNotBlank() == true){
-            uploadViewModel.uploadBasicImage(uri)
+            uploadViewModel.uploadAndGetImage(uri){ downloadUri ->
+                showNewImage(downloadUri)
+            }
         }
     }
 
     private var intentGalleryLauncher = registerForActivityResult(GetContent()){ uriResult ->
         uriResult?.let {
-            uploadViewModel.uploadBasicImage(it)
+            uploadViewModel.uploadAndGetImage(it){ downloadUri ->
+                showNewImage(downloadUri)
+            }
         }
     }
 
@@ -56,6 +67,21 @@ class UploadXmlActivity : AppCompatActivity() {
 
     private fun initUI() {
         initListeners()
+        initUIState()
+    }
+
+    private fun initUIState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                uploadViewModel.isLoading.collect{
+                    binding.pbImage.isVisible = it
+                    if (it){
+                        binding.ivPlaceholder.isVisible = false
+                        binding.ivImage.setImageDrawable(null)
+                    }
+                }
+            }
+        }
     }
 
     private fun initListeners() {
@@ -109,5 +135,13 @@ class UploadXmlActivity : AppCompatActivity() {
         val name : String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date()) + "image"
         return File.createTempFile(name, ".jpg", externalCacheDir)
     }
+
+    private fun showNewImage(downloadUri: Uri) {
+        Glide
+            .with(this)
+            .load(downloadUri)
+            .into(binding.ivImage)
+    }
+
 
 }
