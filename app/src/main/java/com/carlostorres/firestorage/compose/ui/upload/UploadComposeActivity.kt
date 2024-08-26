@@ -39,6 +39,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -51,6 +52,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.carlostorres.firestorage.R
 import com.carlostorres.firestorage.compose.presentation.UploadComposeViewModel
+import com.carlostorres.firestorage.compose.ui.list.ListComposeActivity
 import com.carlostorres.firestorage.databinding.ActivityUploadComposeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
@@ -83,6 +85,8 @@ class UploadComposeActivity : AppCompatActivity() {
     fun UploadScreen(
         viewModel: UploadComposeViewModel = hiltViewModel()
     ) {
+
+        val context = LocalContext.current
 
         val loading by viewModel.isLoading.collectAsState()
 
@@ -254,7 +258,8 @@ class UploadComposeActivity : AppCompatActivity() {
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.White,
                     focusedIndicatorColor = Color.Transparent,
-                    unfocusedLabelColor = Color.Transparent
+                    unfocusedLabelColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
                 ),
                 maxLines = 1,
                 singleLine = true,
@@ -280,6 +285,22 @@ class UploadComposeActivity : AppCompatActivity() {
                     tint = Color.White
                 )
 
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            OutlinedButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 36.dp)
+                    .align(Alignment.CenterHorizontally),
+                border = BorderStroke(2.dp, colorResource(id = R.color.green)),
+                shape = RoundedCornerShape(42),
+                onClick = { 
+                    startActivity(ListComposeActivity.create(context))
+                }
+            ) {
+                Text(text = "Navigate to List", color = colorResource(id = R.color.green))
             }
 
             Spacer(modifier = Modifier.weight(1f))
