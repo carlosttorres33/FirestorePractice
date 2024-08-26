@@ -42,6 +42,7 @@ class UploadXmlActivity : AppCompatActivity() {
     private var intentCameraLauncher = registerForActivityResult(TakePicture()){ result ->
         if (result && uri.path?.isNotBlank() == true){
             uploadViewModel.uploadAndGetImage(uri){ downloadUri ->
+                clearText()
                 showNewImage(downloadUri)
             }
         }
@@ -132,7 +133,10 @@ class UploadXmlActivity : AppCompatActivity() {
     }
 
     private fun createFile() : File {
-        val name : String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date()) + "image"
+        val userTitle = binding.etTitle.text.toString()
+        val name : String = userTitle.ifEmpty {
+            SimpleDateFormat("yyyyMMdd_HHmmss").format(Date()) + "image"
+        }
         return File.createTempFile(name, ".jpg", externalCacheDir)
     }
 
@@ -141,6 +145,11 @@ class UploadXmlActivity : AppCompatActivity() {
             .with(this)
             .load(downloadUri)
             .into(binding.ivImage)
+    }
+
+    private fun clearText(){
+        binding.etTitle.setText("")
+        binding.etTitle.clearFocus()
     }
 
 
