@@ -1,10 +1,13 @@
 package com.carlostorres.firestorage.data
 
 import android.net.Uri
+import android.util.Log
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.UploadTask
 import com.google.firebase.storage.ktx.storage
+import com.google.firebase.storage.ktx.storageMetadata
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
@@ -36,8 +39,10 @@ class StorageService @Inject constructor(
 
     suspend fun uploadAndDownloadImage(uri: Uri) : Uri {
         return suspendCancellableCoroutine<Uri> { cancellableContinuation ->
+
             val reference = storage.reference.child("/download/${uri.lastPathSegment}")
-            reference.putFile(uri).addOnSuccessListener {
+
+            reference.putFile(uri, createMetadata()).addOnSuccessListener {
                 downloadImage(it, cancellableContinuation)
             }.addOnFailureListener {
                 cancellableContinuation.resumeWithException(it)
@@ -54,6 +59,33 @@ class StorageService @Inject constructor(
         }.addOnFailureListener {
             cancellableContinuation.resumeWithException(it)
         }
+    }
+
+    private suspend fun readMetaDataBasic(){
+        val reference = storage.reference.child("ejemplo/test.jpeg")
+        val response = reference.metadata.await()
+        val metaInfo = response.getCustomMetadata("aris")
+        Log.i("Aristidev MetaInfo", metaInfo.orEmpty())
+    }
+
+    private suspend fun readMetaDataAdvanced(){
+        val reference = storage.reference.child("ejemplo/test.jpeg")
+        val response = reference.metadata.await()
+        response.customMetadataKeys.forEach { key ->
+            response.getCustomMetadata(key)?.let { value ->
+                Log.i("Aristidev MetaInfo", "$key: $value")
+            }
+        }
+    }
+
+    private fun createMetadata() : StorageMetadata{
+        val metadata = storageMetadata {
+            contentType = "image/jpeg"
+            setCustomMetadata("date", "12-01-1993")
+            setCustomMetadata("aris", "super pro especial")
+        }
+
+        return metadata
     }
 
 }
