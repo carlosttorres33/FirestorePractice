@@ -61,6 +61,11 @@ class StorageService @Inject constructor(
         }
     }
 
+    private fun deleteImage() : Boolean {
+        val reference = storage.reference.child("ejemplo/test.jpeg")
+        return reference.delete().isSuccessful
+    }
+
     private suspend fun readMetaDataBasic(){
         val reference = storage.reference.child("ejemplo/test.jpeg")
         val response = reference.metadata.await()
