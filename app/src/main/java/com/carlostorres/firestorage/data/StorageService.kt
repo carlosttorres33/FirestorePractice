@@ -101,7 +101,7 @@ class StorageService @Inject constructor(
         }
     }
 
-    private suspend fun getAllImages() : List<Uri> {
+    suspend fun getAllImages() : List<Uri> {
         val reference = storage.reference.child("download")
 //        reference.listAll().addOnSuccessListener { result ->
 //            result.items.forEach {

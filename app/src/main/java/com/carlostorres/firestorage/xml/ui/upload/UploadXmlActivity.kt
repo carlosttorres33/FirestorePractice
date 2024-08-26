@@ -19,6 +19,7 @@ import com.carlostorres.firestorage.MainActivity
 import com.carlostorres.firestorage.databinding.ActivityUploadXmlBinding
 import com.carlostorres.firestorage.databinding.DialogImageSelectorBinding
 import com.carlostorres.firestorage.xml.presentation.UploadXmlViewModel
+import com.carlostorres.firestorage.xml.ui.list.ListXMLActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -86,9 +87,15 @@ class UploadXmlActivity : AppCompatActivity() {
     }
 
     private fun initListeners() {
+
         binding.fabImage.setOnClickListener {
             showImageDialog()
         }
+
+        binding.btnNavToList.setOnClickListener {
+            startActivity(ListXMLActivity.create(this))
+        }
+
     }
 
     private fun showImageDialog() {
