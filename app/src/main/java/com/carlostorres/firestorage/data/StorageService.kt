@@ -101,4 +101,16 @@ class StorageService @Inject constructor(
         }
     }
 
+    private suspend fun getAllImages() : List<Uri> {
+        val reference = storage.reference.child("download")
+//        reference.listAll().addOnSuccessListener { result ->
+//            result.items.forEach {
+//            }
+//        }
+
+        return reference.listAll().await().items.map {
+            it.downloadUrl.await()
+        }
+    }
+
 }
