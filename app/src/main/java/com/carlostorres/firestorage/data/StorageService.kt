@@ -93,4 +93,12 @@ class StorageService @Inject constructor(
         return metadata
     }
 
+    private fun uploadImageWithProgress(uri: Uri){
+        val reference = storage.reference.child("ruta/imagen.png")
+        reference.putFile(uri).addOnProgressListener {
+            val progress = (100.0 * it.bytesTransferred) / it.totalByteCount
+            Log.i("Transfer", "Upload is $progress% done")
+        }
+    }
+
 }
